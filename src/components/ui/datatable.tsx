@@ -30,87 +30,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {parseAsInteger, useQueryState} from "nuqs";
-import qs from "qs";
 import {cn} from "@/lib/utils";
-import useSWR from "swr";
 import {Input} from "./input";
-import debounce from "lodash/debounce";
 
 interface DataTableProps<TData, TValue> {
-  url: string;
   columns: ColumnDef<TData, TValue>[];
 }
 
-interface DataTableMetadata {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-function fetcher(url: string) {
-  return fetch(url).then((res) => res.json());
-}
-
 export function DataTable<TData, TValue>({
-  url,
   columns,
 }: DataTableProps<TData, TValue>) {
-  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [limit, setLimit] = useQueryState(
-    "limit",
-    parseAsInteger.withDefault(10)
-  );
-  const [q, setQ] = useQueryState("q", {defaultValue: ""});
-  const [type, setType] = useQueryState("type", {defaultValue: ""});
-  const {data, isLoading} = useSWR(
-    `${url}?${qs.stringify({page, q, type, limit})}`,
-    {
-      fetcher,
-      revalidateOnFocus: false,
-    }
-  );
-
-  const {items, metadata} = React.useMemo(() => {
-    return {items: data?.items, metadata: data?.metadata};
-  }, [data]);
-
-  const pagesToRender = React.useMemo(() => {
-    if (!metadata) return [];
-
-    const maxPagesToRender = 5;
-
-    const pages = [];
-    let startIndex = metadata.page - 2;
-    let endIndex = metadata.page + 2;
-
-    if (metadata.totalPages <= maxPagesToRender) {
-      startIndex = 1;
-      endIndex = metadata.totalPages;
-    } else {
-      if (startIndex < 1) {
-        startIndex = 1;
-        endIndex = maxPagesToRender;
-      }
-
-      if (endIndex > metadata.totalPages) {
-        startIndex = metadata.totalPages - maxPagesToRender + 1;
-        endIndex = metadata.totalPages;
-      }
-    }
-
-    for (let i = startIndex; i <= endIndex; i++) {
-      pages.push(i);
-    }
-
-    return pages;
-  }, [metadata]);
-
+  const isLoading = false;
   const table = useReactTable({
-    data: items,
+    data: [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -119,21 +51,8 @@ export function DataTable<TData, TValue>({
     <div className="grid gap-2">
       <div className="flex gap-2 justify-between">
         <div className="flex gap-2">
-          <Input
-            placeholder="Search by id or email"
-            onChange={debounce((e) => {
-              setPage(1);
-              setQ(e.target.value);
-            }, 500)}
-            className="w-48"
-          />
-          <Select
-            onValueChange={(value) => {
-              setPage(1);
-              setType(value === "all" ? "" : value);
-            }}
-            defaultValue="all"
-          >
+          <Input placeholder="Search by id or email" className="w-48" />
+          <Select defaultValue="all">
             <SelectTrigger>
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
@@ -147,10 +66,7 @@ export function DataTable<TData, TValue>({
           </Select>
         </div>
         <div>
-          <Select
-            onValueChange={(value) => setLimit(parseInt(value))}
-            defaultValue={limit.toString()}
-          >
+          <Select>
             <SelectTrigger>
               <SelectValue placeholder="Select limit" />
             </SelectTrigger>
@@ -228,49 +144,30 @@ export function DataTable<TData, TValue>({
         <>
           <footer className="w-full flex justify-between items-center gap-10">
             <p className="flex-1 text-sm font-bold">
-              Página {metadata.page} de {metadata.totalPages} com{" "}
-              {metadata.total} resultados
+              Página 0 de 0 com 0 resultados
             </p>
             <Pagination className="flex-1 justify-end">
               <PaginationContent>
-                <PaginationItem disabled={!metadata.hasPreviousPage}>
-                  <PaginationPrevious href="#" onClick={() => setPage(1)}>
-                    Primeira
-                  </PaginationPrevious>
+                <PaginationItem>
+                  <PaginationPrevious>Primeira</PaginationPrevious>
                 </PaginationItem>
-                <PaginationItem disabled={!metadata.hasPreviousPage}>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={() => setPage(page - 1)}
+                <PaginationItem>
+                  <PaginationPrevious>Anterior</PaginationPrevious>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink
+                    className={cn({
+                      underline: false,
+                    })}
                   >
-                    Anterior
-                  </PaginationPrevious>
+                    1
+                  </PaginationLink>
                 </PaginationItem>
-                {pagesToRender.map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      href="#"
-                      onClick={() => setPage(page)}
-                      className={cn({
-                        underline: page === metadata.page,
-                      })}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem disabled={!metadata.hasNextPage}>
-                  <PaginationNext href="#" onClick={() => setPage(page + 1)}>
-                    Próxima
-                  </PaginationNext>
+                <PaginationItem>
+                  <PaginationNext>Próxima</PaginationNext>
                 </PaginationItem>
-                <PaginationItem disabled={!metadata.hasNextPage}>
-                  <PaginationNext
-                    href="#"
-                    onClick={() => setPage(metadata.totalPages)}
-                  >
-                    Última
-                  </PaginationNext>
+                <PaginationItem>
+                  <PaginationNext>Última</PaginationNext>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>

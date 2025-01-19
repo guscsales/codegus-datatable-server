@@ -47,7 +47,5 @@ const columns = [
 ];
 
 export function TransactionsDataTable() {
-  return (
-    <DataTable url="http://localhost:7543/api/transactions" columns={columns} />
-  );
+  return <DataTable columns={columns} />;
 }
