@@ -26,9 +26,7 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -37,6 +35,7 @@ import qs from "qs";
 import {cn} from "@/lib/utils";
 import useSWR from "swr";
 import {Input} from "./input";
+import debounce from "lodash/debounce";
 
 interface DataTableProps<TData, TValue> {
   url: string;
@@ -122,10 +121,10 @@ export function DataTable<TData, TValue>({
         <div className="flex gap-2">
           <Input
             placeholder="Search by id or email"
-            onChange={(e) => {
+            onChange={debounce((e) => {
               setPage(1);
               setQ(e.target.value);
-            }}
+            }, 500)}
             className="w-48"
           />
           <Select

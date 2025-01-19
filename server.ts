@@ -32,8 +32,6 @@ app.get("/api/transactions", async (req, res) => {
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
-    console.log(pageNumber, limitNumber, skip);
-
     let where: Prisma.TransactionWhereInput = {};
 
     if (q) {
