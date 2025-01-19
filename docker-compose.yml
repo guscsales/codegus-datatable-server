@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  main-db:
+    image: postgres:16
+    restart: always
+    container_name: codegus_dt_db
+    environment:
+      POSTGRES_DB: 'codegus_dt'
+      POSTGRES_USER: 'codegus_dt'
+      POSTGRES_PASSWORD: '12345678'
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
+    volumes:
+      - ./data/db:/var/lib/postgresql/data

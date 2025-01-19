@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+  TRANSFER
+  PAYMENT
+}
+
+enum TransactionPaymentMethod {
+  CREDIT_CARD
+  PIX
+  BOLETO
+  PAYPAL
+  OTHER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Transaction {
+  id       String            @id @default(cuid())
+  hash     String            @unique
+  status   TransactionStatus @default(PENDING)
+  type     TransactionType
+  currency String            @default("BRL")
+
+  trackingCode String? @unique
+  externalId   String? @unique
+
+  processedAt DateTime?
+  confirmedAt DateTime?
+  failedAt    DateTime?
+  refundedAt  DateTime?
+  cancelledAt DateTime?
+
+  paymentMethod  TransactionPaymentMethod
+  paymentDetails Json?
+  installments   Int?
+  fee            Decimal?                 @db.Decimal(10, 2)
+  netAmount      Decimal?                 @db.Decimal(10, 2)
+  totalAmount    Decimal                  @db.Decimal(10, 2)
+
+  tags String[]
+
+  ipAddress String?
+
+  retryCount Int @default(0)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([paymentMethod])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("transactions")
+}
