@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type {Metadata} from "next";
+import {Geist, Geist_Mono} from "next/font/google";
+import {NuqsAdapter} from "nuqs/adapters/next/app";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,9 +26,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-50 text-foreground`}
       >
-        {children}
+        <div className="p-4">
+          <NuqsAdapter>
+            <header className="mb-4">
+              <h1 className="text-2xl font-bold">
+                DataTable: Consumindo Dados do Servidor (Consuming Data from
+                Server)
+              </h1>
+            </header>
+            <main>{children}</main>
+          </NuqsAdapter>
+        </div>
       </body>
     </html>
   );

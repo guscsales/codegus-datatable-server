@@ -53,16 +53,17 @@ const BATCH_SIZE = 10000;
         BATCH_SIZE,
         TRANSACTIONS_COUNT - i * BATCH_SIZE
       );
+      const status = faker.helpers.arrayElement([
+        "PENDING",
+        "COMPLETED",
+        "FAILED",
+        "REFUNDED",
+        "CANCELLED",
+      ]);
       const transactions = Array.from({length: batchSize}, () => ({
         userId: faker.helpers.arrayElement(usersIds),
         hash: faker.string.alphanumeric({length: 32}),
-        status: faker.helpers.arrayElement([
-          "PENDING",
-          "COMPLETED",
-          "FAILED",
-          "REFUNDED",
-          "CANCELLED",
-        ]),
+        status,
         type: faker.helpers.arrayElement([
           "CREDIT",
           "DEBIT",
@@ -73,10 +74,10 @@ const BATCH_SIZE = 10000;
         trackingCode: faker.string.alphanumeric({length: 16}),
         externalId: faker.string.uuid(),
         processedAt: faker.date.past(),
-        confirmedAt: faker.date.past(),
-        failedAt: faker.date.past(),
-        refundedAt: faker.date.past(),
-        cancelledAt: faker.date.past(),
+        confirmedAt: status === "COMPLETED" ? faker.date.past() : null,
+        failedAt: status === "FAILED" ? faker.date.past() : null,
+        refundedAt: status === "REFUNDED" ? faker.date.past() : null,
+        cancelledAt: status === "CANCELLED" ? faker.date.past() : null,
         paymentMethod: faker.helpers.arrayElement([
           "CREDIT_CARD",
           "PIX",
@@ -86,11 +87,7 @@ const BATCH_SIZE = 10000;
         ]),
         paymentDetails: {
           cardLastFour: faker.finance.creditCardNumber("####"),
-          cardBrand: faker.helpers.arrayElement([
-            "visa",
-            "mastercard",
-            "amex",
-          ]),
+          cardBrand: faker.helpers.arrayElement(["visa", "mastercard", "amex"]),
         },
         installments: faker.number.int({min: 1, max: 12}),
         fee: faker.number.float({min: 1, max: 100, fractionDigits: 2}),
@@ -110,6 +107,7 @@ const BATCH_SIZE = 10000;
         ),
         ipAddress: faker.internet.ip(),
         retryCount: faker.number.int({min: 0, max: 5}),
+        createdAt: faker.date.past(),
       }));
 
       await prisma.transaction.createMany({

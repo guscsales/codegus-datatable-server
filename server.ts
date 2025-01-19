@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import {PrismaClient, Prisma} from "@prisma/client";
+import {PrismaClient, Prisma, TransactionType} from "@prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -13,6 +13,7 @@ interface QueryParams {
   page?: string;
   limit?: string;
   q?: string;
+  type?: TransactionType;
   sortField?: string;
   sortDirection?: Prisma.SortOrder;
 }
@@ -23,6 +24,7 @@ app.get("/api/transactions", async (req, res) => {
       page = "1",
       limit = "10",
       q = "",
+      type = "",
       sortField = "createdAt",
       sortDirection = "desc",
     } = req.query as QueryParams;
@@ -30,52 +32,66 @@ app.get("/api/transactions", async (req, res) => {
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
-    const where: Prisma.TransactionWhereInput = q
-      ? {
-          OR: [
-            {id: {equals: q}},
-            {hash: {equals: q}},
-            {
-              user: {
-                OR: [
-                  {
-                    name: {
-                      contains: q,
-                      mode: "insensitive" as Prisma.QueryMode,
-                    },
-                  },
-                  {email: {contains: q}},
-                ],
-              },
+    console.log(pageNumber, limitNumber, skip);
+
+    let where: Prisma.TransactionWhereInput = {};
+
+    if (q) {
+      where = {
+        OR: [
+          {id: {equals: q}},
+          {
+            user: {
+              OR: [{email: {contains: q, mode: "insensitive"}}],
             },
-          ],
-        }
-      : {};
+          },
+        ],
+      };
+    }
+
+    if (type) {
+      where = {
+        ...where,
+        AND: {
+          type,
+        },
+      };
+    }
 
     const [transactions, total] = await Promise.all([
       prisma.transaction.findMany({
-        where,
-        include: {
+        select: {
+          id: true,
+          currency: true,
+          netAmount: true,
+          totalAmount: true,
+          installments: true,
+          paymentMethod: true,
+          status: true,
+          type: true,
+          createdAt: true,
+          processedAt: true,
+          confirmedAt: true,
+          failedAt: true,
+          refundedAt: true,
+          cancelledAt: true,
           user: {
             select: {
-              id: true,
-              name: true,
               email: true,
             },
           },
         },
+        where,
         skip,
         take: limitNumber,
         orderBy:
-          sortField == "userEmail"
+          sortField === "userEmail"
             ? {
                 user: {
                   email: sortDirection,
                 },
               }
-            : {
-                [sortField]: sortDirection,
-              },
+            : {createdAt: sortDirection},
       }),
       prisma.transaction.count({where}),
     ]);
