@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -84,10 +85,5 @@ model Transaction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([status])
-  @@index([type])
-  @@index([paymentMethod])
-  @@index([createdAt])
-  @@index([userId])
   @@map("transactions")
 }
