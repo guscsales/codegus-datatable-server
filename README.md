@@ -40,9 +40,15 @@ docker compose up -d
 
 Seed the database with some data:
 
-**Note: by default the seed-db script will create 1000000 transaction records. And 50000 users records. You can update these parameters directly in the `seed-db.ts` file updating the variables `TRANSACTIONS_SEED_COUNT` and `USERS_SEED_COUNT`.**
+**Note: by default the seed-db script will create 1000000 transactions, and 50000 users. You can update these parameters directly in the `seed-db.ts` file updating the variables `TRANSACTIONS_COUNT` and `USERS_COUNT`.**
 
 **The process to seed the database may take a while.**
+
+Create a `.env` file in the root of the project with the following content:
+
+```bash
+DATABASE_URL="postgresql://codegus_dt:12345678@localhost:5432/codegus_dt?schema=public"
+```
 
 Run the seed script:
 
