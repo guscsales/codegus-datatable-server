@@ -6,7 +6,13 @@ The datatable contains filters by search (with debounce) and type, pagination an
 
 The project is built with Next.js, Shadcn/UI, Tanstack Table, and SWR. The backend is built with Node.js, Express, Prisma and Docker.
 
-**Make sure to have Docker installed and running.**
+This project was created to teach people from my YouTube channel [Codegus](https://codeg.us/yt?utm_source=github) on how to render a DataTable consuming the data from an API.
+
+## Before Continue
+
+**PS: Make sure to have Docker installed and running.**
+
+**PPS: To run the final implementation, please use the branch `rehearsal`**
 
 ## Example Running
 
