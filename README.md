@@ -16,7 +16,7 @@ This project was created to teach people from my YouTube channel [Codegus](https
 
 ## Example Running
 
-<img src="https://raw.githubusercontent.com/guscsales/codegus-datatable-server/refs/heads/main/public/readme/example-running.gif" alt="Example Running" width="1000" />
+<img src="https://raw.githubusercontent.com/guscsales/codegus-datatable-server/refs/heads/main/public/readme/example-running-1.gif" alt="Example Running" width="1000" />
 
 ## Getting Started
 
