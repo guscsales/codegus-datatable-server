@@ -131,51 +131,72 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    setPage(1);
+    setQ(e.target.value);
+  }
+
+  function handleChangeType(value: string) {
+    setPage(1);
+    setType(value === "all" ? "" : value);
+  }
+
+  function handleChangeLimit(value: string) {
+    setPage(1);
+    setLimit(parseInt(value));
+  }
+
+  function handleUpdateSort(field: string) {
+    setPage(1);
+    setSortField(field);
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  }
+
   return (
     <div className="grid gap-2">
       <div className="flex gap-2 justify-between">
         <div className="flex gap-2">
-          <Input
-            defaultValue={q}
-            placeholder="Search by id or email"
-            onChange={debounce((e) => {
-              setPage(1);
-              setQ(e.target.value);
-            }, 500)}
-            className="w-48"
-          />
-          <Select
-            onValueChange={(value) => {
-              setPage(1);
-              setType(value === "all" ? "" : value);
-            }}
-            defaultValue={type || "all"}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="CREDIT">Credit</SelectItem>
-              <SelectItem value="DEBIT">Debit</SelectItem>
-              <SelectItem value="TRANSFER">Transfer</SelectItem>
-              <SelectItem value="PAYMENT">Payment</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-bold">Busca:</div>
+            <Input
+              defaultValue={q}
+              placeholder="Search by id or email"
+              onChange={debounce(handleSearch, 500)}
+              className="w-48"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-bold">Tipo:</div>
+            <Select
+              onValueChange={handleChangeType}
+              defaultValue={type || "all"}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="CREDIT">Credit</SelectItem>
+                <SelectItem value="DEBIT">Debit</SelectItem>
+                <SelectItem value="TRANSFER">Transfer</SelectItem>
+                <SelectItem value="PAYMENT">Payment</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div>
           <Select
-            onValueChange={(value) => setLimit(parseInt(value))}
+            onValueChange={handleChangeLimit}
             defaultValue={limit.toString()}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select limit" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10">10 Rows</SelectItem>
-              <SelectItem value="20">20 Rows</SelectItem>
-              <SelectItem value="50">50 Rows</SelectItem>
-              <SelectItem value="100">100 Rows</SelectItem>
+              <SelectItem value="10">10 Registros</SelectItem>
+              <SelectItem value="20">20 Registros</SelectItem>
+              <SelectItem value="50">50 Registros</SelectItem>
+              <SelectItem value="100">100 Registros</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -195,15 +216,11 @@ export function DataTable<TData, TValue>({
                           "cursor-pointer hover:text-foreground": isSortable,
                           "text-foreground": isSorted,
                         })}
-                        onClick={() => {
-                          if (isSortable) {
-                            setPage(1);
-                            setSortField(header.id);
-                            setSortDirection(
-                              sortDirection === "asc" ? "desc" : "asc"
-                            );
-                          }
-                        }}
+                        onClick={
+                          isSortable
+                            ? () => handleUpdateSort(header.id)
+                            : undefined
+                        }
                       >
                         {header.isPlaceholder
                           ? null
@@ -266,7 +283,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      {!isLoading && (
+      {!isLoading && table.getRowModel().rows?.length > 0 && (
         <>
           <footer className="w-full flex justify-between items-center gap-10">
             <p className="flex-1 text-sm font-bold">
