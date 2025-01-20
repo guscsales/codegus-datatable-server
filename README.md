@@ -16,7 +16,7 @@ This project was created to teach people from my YouTube channel [Codegus](https
 
 ## Example Running
 
-<img src="https://github.com/guscsales/codegus-datatable-server/tree/main/public/readme/example-running.gif" alt="Example Running" width="1000" />
+<img src="https://raw.githubusercontent.com/guscsales/codegus-datatable-server/refs/heads/main/public/readme/example-running-1.gif" alt="Example Running" width="1000" />
 
 ## Getting Started
 
@@ -40,9 +40,15 @@ docker compose up -d
 
 Seed the database with some data:
 
-**Note: by default the seed-db script will create 1000000 transaction records. And 50000 users records. You can update these parameters directly in the `seed-db.ts` file updating the variables `TRANSACTIONS_SEED_COUNT` and `USERS_SEED_COUNT`.**
+**Note: by default the seed-db script will create 1000000 transactions, and 50000 users. You can update these parameters directly in the `seed-db.ts` file updating the variables `TRANSACTIONS_COUNT` and `USERS_COUNT`.**
 
 **The process to seed the database may take a while.**
+
+Create a `.env` file in the root of the project with the following content:
+
+```bash
+DATABASE_URL="postgresql://codegus_dt:12345678@localhost:5432/codegus_dt?schema=public"
+```
 
 Run the seed script:
 
@@ -52,7 +58,7 @@ pnpm seed-db
 
 You'll see the following output:
 
-<img src="https://github.com/guscsales/codegus-datatable-server/tree/main/public/readme/seed-db.png" alt="Seed DB" width="500" />
+<img src="https://raw.githubusercontent.com/guscsales/codegus-datatable-server/refs/heads/main/public/readme/seed-db.png" alt="Seed DB" width="500" />
 
 ### Step 4
 
