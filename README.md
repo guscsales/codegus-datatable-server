@@ -16,7 +16,7 @@ This project was created to teach people from my YouTube channel [Codegus](https
 
 ## Example Running
 
-<img src="https://github.com/guscsales/codegus-datatable-server/tree/main/public/readme/example-running.gif" alt="Example Running" width="1000" />
+<img src="https://raw.githubusercontent.com/guscsales/codegus-datatable-server/refs/heads/main/public/readme/example-running.gif" alt="Example Running" width="1000" />
 
 ## Getting Started
 
@@ -52,7 +52,7 @@ pnpm seed-db
 
 You'll see the following output:
 
-<img src="https://github.com/guscsales/codegus-datatable-server/tree/main/public/readme/seed-db.png" alt="Seed DB" width="500" />
+<img src="https://raw.githubusercontent.com/guscsales/codegus-datatable-server/refs/heads/main/public/readme/seed-db.png" alt="Seed DB" width="500" />
 
 ### Step 4
 
