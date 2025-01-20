@@ -36,19 +36,26 @@ import {cn} from "@/lib/utils";
 import useSWR from "swr";
 import {Input} from "./input";
 import debounce from "lodash/debounce";
+import {ArrowUp, ArrowUpDown} from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   url: string;
   columns: ColumnDef<TData, TValue>[];
+  sortColumns?: string[];
+  defaultSortField?: string;
+  defaultSortDirection?: "asc" | "desc";
 }
 
-interface DataTableMetadata {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+interface DataTableData<TData> {
+  items: TData[];
+  metadata: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 }
 
 function fetcher(url: string) {
@@ -58,6 +65,9 @@ function fetcher(url: string) {
 export function DataTable<TData, TValue>({
   url,
   columns,
+  sortColumns,
+  defaultSortField,
+  defaultSortDirection,
 }: DataTableProps<TData, TValue>) {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [limit, setLimit] = useQueryState(
@@ -66,15 +76,21 @@ export function DataTable<TData, TValue>({
   );
   const [q, setQ] = useQueryState("q", {defaultValue: ""});
   const [type, setType] = useQueryState("type", {defaultValue: ""});
+  const [sortField, setSortField] = useQueryState("sortField", {
+    defaultValue: defaultSortField || "",
+  });
+  const [sortDirection, setSortDirection] = useQueryState("sortDirection", {
+    defaultValue: defaultSortDirection || "",
+  });
   const {data, isLoading} = useSWR(
-    `${url}?${qs.stringify({page, q, type, limit})}`,
+    `${url}?${qs.stringify({page, q, type, limit, sortField, sortDirection})}`,
     {
       fetcher,
       revalidateOnFocus: false,
     }
   );
 
-  const {items, metadata} = React.useMemo(() => {
+  const {items, metadata} = React.useMemo<DataTableData<TData>>(() => {
     return {items: data?.items, metadata: data?.metadata};
   }, [data]);
 
@@ -120,6 +136,7 @@ export function DataTable<TData, TValue>({
       <div className="flex gap-2 justify-between">
         <div className="flex gap-2">
           <Input
+            defaultValue={q}
             placeholder="Search by id or email"
             onChange={debounce((e) => {
               setPage(1);
@@ -132,7 +149,7 @@ export function DataTable<TData, TValue>({
               setPage(1);
               setType(value === "all" ? "" : value);
             }}
-            defaultValue="all"
+            defaultValue={type || "all"}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select type" />
@@ -169,14 +186,39 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const isSortable = sortColumns?.includes(header.id);
+                  const isSorted = sortField === header.id;
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      <div
+                        className={cn("flex items-center gap-0.5", {
+                          "cursor-pointer hover:text-foreground": isSortable,
+                          "text-foreground": isSorted,
+                        })}
+                        onClick={() => {
+                          if (isSortable) {
+                            setPage(1);
+                            setSortField(header.id);
+                            setSortDirection(
+                              sortDirection === "asc" ? "desc" : "asc"
+                            );
+                          }
+                        }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                        {isSorted && (
+                          <ArrowUp
+                            className={cn("ml-2 h-4 w-4", {
+                              "rotate-180": sortDirection === "desc",
+                            })}
+                          />
+                        )}
+                      </div>
                     </TableHead>
                   );
                 })}

@@ -33,6 +33,7 @@ app.get("/api/transactions", async (req, res) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     let where: Prisma.TransactionWhereInput = {};
+    let orderBy: Prisma.TransactionOrderByWithRelationInput = {};
 
     if (q) {
       where = {
@@ -54,6 +55,17 @@ app.get("/api/transactions", async (req, res) => {
           type,
         },
       };
+    }
+
+    if (sortField && sortDirection) {
+      orderBy =
+        sortField === "user.email"
+          ? {
+              user: {
+                email: sortDirection,
+              },
+            }
+          : {[sortField]: sortDirection};
     }
 
     const [transactions, total] = await Promise.all([
@@ -82,14 +94,7 @@ app.get("/api/transactions", async (req, res) => {
         where,
         skip,
         take: limitNumber,
-        orderBy:
-          sortField === "userEmail"
-            ? {
-                user: {
-                  email: sortDirection,
-                },
-              }
-            : {createdAt: sortDirection},
+        orderBy,
       }),
       prisma.transaction.count({where}),
     ]);
