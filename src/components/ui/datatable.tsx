@@ -36,7 +36,7 @@ import {cn} from "@/lib/utils";
 import useSWR from "swr";
 import {Input} from "./input";
 import debounce from "lodash/debounce";
-import {ArrowUp, ArrowUpDown} from "lucide-react";
+import {ArrowUp} from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   url: string;
