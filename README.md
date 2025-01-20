@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DataTable Consuming From Server
+
+This project is a simple example of how to consume a DataTable from a server in a large dataset with more than 1 million transaction records.
+
+The datatable contains filters by search (with debounce) and type, pagination and sorting.
+
+The project is built with Next.js, Shadcn/UI, Tanstack Table, and SWR. The backend is built with Node.js, Express, Prisma and Docker.
+
+**Make sure to have Docker installed and running.**
+
+## Example Running
+
+<img src="https://github.com/guscsales/codegus-datatable-server/tree/main/public/readme/example-running.gif" alt="Example Running" width="1000" />
 
 ## Getting Started
 
-First, run the development server:
+### Step 1
+
+Install all dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Step 2
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create the Postgres database to be running in Docker:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+docker compose up -d
+```
 
-## Learn More
+### Step 3
 
-To learn more about Next.js, take a look at the following resources:
+Seed the database with some data:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Note: by default the seed-db script will create 1000000 transaction records. And 50000 users records. You can update these parameters directly in the `seed-db.ts` file updating the variables `TRANSACTIONS_SEED_COUNT` and `USERS_SEED_COUNT`.**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**The process to seed the database may take a while.**
 
-## Deploy on Vercel
+Run the seed script:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm seed-db
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+You'll see the following output:
+
+<img src="https://github.com/guscsales/codegus-datatable-server/tree/main/public/readme/seed-db.png" alt="Seed DB" width="500" />
+
+### Step 4
+
+Run the API that consumes the database:
+
+```bash
+pnpm run-server
+```
+
+The fetch endpoint is running in [http://localhost:7543/api/transactions](http://localhost:7543/api/transactions).
+
+### Step 5
+
+In another terminal, run the Next.js application:
+
+```bash
+pnpm dev
+```
+
+Open the browser and go to [http://localhost:3000](http://localhost:3000) to see the result.
