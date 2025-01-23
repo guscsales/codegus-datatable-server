@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
   }, [metadata]);
 
   const table = useReactTable({
-    data: items,
+    data: items || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -160,7 +160,7 @@ export function DataTable<TData, TValue>({
             <div className="text-sm font-bold">Busca:</div>
             <Input
               defaultValue={q}
-              placeholder="Search by id or email"
+              placeholder="Buscar por id ou email"
               onChange={debounce(handleSearch, 500)}
               className="w-48"
             />
@@ -172,14 +172,14 @@ export function DataTable<TData, TValue>({
               defaultValue={type || "all"}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="CREDIT">Credit</SelectItem>
-                <SelectItem value="DEBIT">Debit</SelectItem>
-                <SelectItem value="TRANSFER">Transfer</SelectItem>
-                <SelectItem value="PAYMENT">Payment</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="CREDIT">Crédito</SelectItem>
+                <SelectItem value="DEBIT">Débito</SelectItem>
+                <SelectItem value="TRANSFER">Transferência</SelectItem>
+                <SelectItem value="PAYMENT">Pagamento</SelectItem>
               </SelectContent>
             </Select>
           </div>
